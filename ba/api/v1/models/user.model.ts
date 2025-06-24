@@ -1,0 +1,24 @@
+import { Schema, model } from "mongoose";
+
+const userSchema = new Schema({
+  username: String,
+  fullName: String,
+  email: String,
+  password: { type: String, select: false },
+  token: { type: String, select: false },
+  sex: String,
+  avatar: {
+    type: String,
+    default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+  },
+  role: { type: String, enum: ["PATIENT", "DOCTOR", "ADMIN"], require: true },
+  status: { type: String, default: "active" },
+  isConfirmed: { type: Boolean, default: false },
+  deleted: { type: Boolean, default: false },
+  deletedAt: Date,
+  statusOnline: String,
+});
+
+const User = model("User", userSchema, "user");
+
+export default User;
