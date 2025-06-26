@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import Doctor from '../models/doctor.model';
 
+const isTimeConflict = (startA: string, endA: string, startB: string, endB: string): boolean => {
+  return startA < endB && startB < endA;
+};
+
 // Get /api/v1/doctors/list-doctor
 export const listDoctor = async (req: Request, res: Response): Promise<any> => {
   try {

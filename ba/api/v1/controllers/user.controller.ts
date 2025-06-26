@@ -1,12 +1,12 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-import User from '../models/user.model';
-import ForgotPassword from '../models/forgot-password.model';
-import * as sendMailHelper from '../../../helpers/sendMail';
-import * as generateHelper from '../../../helpers/generate';
-import Doctor from '../models/doctor.model';
+import User from "../models/user.model";
+import ForgotPassword from "../models/forgot-password.model";
+import * as sendMailHelper from "../../../helpers/sendMail";
+import * as generateHelper from "../../../helpers/generate";
+import Doctor from "../models/doctor.model";
 
 // Post /api/v1/users/auth/login
 export const loginUser = async (req: Request, res: Response): Promise<any> => {
@@ -14,25 +14,27 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
     const { username, password } = req.body;
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username);
 
-    const user = await User.findOne(isEmail ? { email: username, deleted: false } : { username: username, deleted: false }).select('+password +token');
+    const user = await User.findOne(isEmail ? { email: username, deleted: false } : { username: username, deleted: false }).select(
+      "+password +token",
+    );
 
     if (!user) {
-      return res.status(404).json({ code: 404, message: 'User not found' });
+      return res.status(404).json({ code: 404, message: "User not found" });
     }
 
     if (!user.isConfirmed) {
-      return res.status(405).json({ code: 405, message: 'Unverified account' });
+      return res.status(405).json({ code: 405, message: "Unverified account" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ code: 401, message: 'Invalid password' });
+      return res.status(401).json({ code: 401, message: "Invalid password" });
     }
 
     res.status(200).json({
       code: 200,
-      message: 'User login successful',
+      message: "User login successful",
       result: user.token,
     });
   } catch (error) {
@@ -47,12 +49,12 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
 
     const existEmail = await User.findOne({ email: email, deleted: false });
     if (existEmail) {
-      return res.status(400).json({ code: 400, message: 'Email already exists' });
+      return res.status(400).json({ code: 400, message: "Email already exists" });
     }
 
     const existsUsername = await User.findOne({ username: username });
     if (existsUsername) {
-      return res.status(400).json({ code: 400, message: 'Username already exists' });
+      return res.status(400).json({ code: 400, message: "Username already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -67,8 +69,8 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
       role,
     });
 
-    if (role === 'DOCTOR') {
-      await Doctor.create({ user_id: newUser._id });
+    if (role === "doctor") {
+      await Doctor.create({ _id: newUser._id, user_id: newUser._id });
     }
 
     const token = jwt.sign(
@@ -77,17 +79,18 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
         username: newUser.username,
         fullName: newUser.fullName,
         email: newUser.email,
+        role: newUser.role,
       },
       process.env.JWT_SECRET,
       // { expiresIn: "1d" }
     );
     newUser.token = token;
 
-    await newUser.save();
+    // await newUser.save();
 
     res.status(201).json({
       code: 201,
-      message: 'User registered successfully',
+      message: "User registered successfully",
       result: newUser,
     });
   } catch (error) {
@@ -102,7 +105,7 @@ export const sentConfirmAccount = async (req: Request, res: Response): Promise<a
     const user = await User.findOne({ email: email, deleted: false });
 
     if (!user) {
-      return res.status(404).json({ code: 404, message: 'User not found' });
+      return res.status(404).json({ code: 404, message: "User not found" });
     }
 
     // 1: tạo mã otp và lưu otp, email yêu cầu vào collection
@@ -111,7 +114,7 @@ export const sentConfirmAccount = async (req: Request, res: Response): Promise<a
     const objectConfirmAccount = {
       email: email,
       otp: otp,
-      action: 'ConfirmAccount',
+      action: "ConfirmAccount",
       expireAt: Date.now(),
     };
 
@@ -120,7 +123,7 @@ export const sentConfirmAccount = async (req: Request, res: Response): Promise<a
     // end tạo mã otp và lưu thông tin yêu cầu vào collection
 
     // 2:  gửi mã otp qua email của user
-    const subject = 'Mã OTP xác thực tài khoản.';
+    const subject = "Mã OTP xác thực tài khoản.";
     const htmlSendMail = `Mã OTP xác thực của bạn là <b style="color: green;">${otp}</b>. Mã OTP có hiệu lực trong 5 phút. Vui lòng không cung cấp mã OTP cho người khác.`;
 
     sendMailHelper.sendEmail(email, subject, htmlSendMail);
@@ -128,7 +131,7 @@ export const sentConfirmAccount = async (req: Request, res: Response): Promise<a
 
     res.status(200).json({
       code: 200,
-      message: 'OTP confirm account sent to email successfully',
+      message: "OTP confirm account sent to email successfully",
     });
   } catch (error) {
     res.status(500).send({ code: 500, error: error.message });
@@ -143,18 +146,18 @@ export const confirmAccount = async (req: Request, res: Response): Promise<any> 
     const result = await ForgotPassword.findOne({
       email: email,
       otp: otpConfirm,
-      action: 'ConfirmAccount',
+      action: "ConfirmAccount",
     });
 
     if (!result) {
-      res.status(404).json({ code: 404, message: 'Invalid OTP or email' });
+      res.status(404).json({ code: 404, message: "Invalid OTP or email" });
     }
 
     await User.updateOne({ email: email, deleted: false }, { $set: { isConfirmed: true } });
 
     res.status(200).json({
       code: 200,
-      message: 'Email has been verified!',
+      message: "Email has been verified!",
     });
   } catch (error) {
     res.status(500).json({ code: 500, error: error.message });
@@ -168,11 +171,11 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
     const updateData = req.body;
     const myUserId = req.user.id;
 
-    if (req.user.role !== 'ADMIN') {
+    if (req.user.role !== "admin") {
       if (userId !== myUserId) {
         return res.status(403).json({
           code: 403,
-          message: 'You are not authorized to update this user',
+          message: "You are not authorized to update this user",
         });
       }
     }
@@ -183,7 +186,7 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
 
     res.status(200).json({
       code: 200,
-      message: 'User updated successfully',
+      message: "User updated successfully",
       result: updatedUser,
     });
   } catch (error) {
@@ -198,12 +201,12 @@ export const getUserInfo = async (req: Request, res: Response): Promise<any> => 
     const user = await User.findOne({ _id: userId, deleted: false });
 
     if (!user) {
-      return res.status(404).json({ code: 404, message: 'User not found' });
+      return res.status(404).json({ code: 404, message: "User not found" });
     }
 
     res.status(200).json({
       code: 200,
-      message: 'User information retrieved successfully',
+      message: "User information retrieved successfully",
       result: user,
     });
   } catch (error) {
@@ -219,12 +222,12 @@ export const getMyProfile = async (req: Request, res: Response): Promise<any> =>
     const user = await User.findOne({ _id: myUserId, deleted: false });
 
     if (!user) {
-      return res.status(404).json({ code: 404, message: 'User not found' });
+      return res.status(404).json({ code: 404, message: "User not found" });
     }
 
     res.status(200).json({
       code: 200,
-      message: 'My profile retrieved successfully',
+      message: "My profile retrieved successfully",
       result: user,
     });
   } catch (error) {
@@ -240,7 +243,7 @@ export const forgotPasswordPost = async (req: Request, res: Response): Promise<a
     const user = await User.findOne({ email: email, deleted: false });
 
     if (!user) {
-      return res.status(404).json({ code: 404, message: 'User not found' });
+      return res.status(404).json({ code: 404, message: "User not found" });
     }
 
     // 1: tạo mã otp và lưu otp, email yêu cầu vào collection
@@ -249,7 +252,7 @@ export const forgotPasswordPost = async (req: Request, res: Response): Promise<a
     const objectForgotPassword = {
       email: email,
       otp: otp,
-      action: 'ForgotPassword',
+      action: "ForgotPassword",
       expireAt: Date.now(),
     };
 
@@ -258,7 +261,7 @@ export const forgotPasswordPost = async (req: Request, res: Response): Promise<a
     // end tạo mã otp và lưu thông tin yêu cầu vào collection
 
     // 2:  gửi mã otp qua email của user
-    const subject = 'Mã OTP lấy lại mật khẩu.';
+    const subject = "Mã OTP lấy lại mật khẩu.";
     const htmlSendMail = `Mã OTP xác thực của bạn là <b style="color: green;">${otp}</b>. Mã OTP có hiệu lực trong 5 phút. Vui lòng không cung cấp mã OTP cho người khác.`;
 
     sendMailHelper.sendEmail(email, subject, htmlSendMail);
@@ -266,7 +269,7 @@ export const forgotPasswordPost = async (req: Request, res: Response): Promise<a
 
     res.status(200).json({
       code: 200,
-      message: 'OTP sent to email successfully',
+      message: "OTP sent to email successfully",
     });
   } catch (error) {
     res.status(500).send({ code: 500, error: error.message });
@@ -281,21 +284,21 @@ export const otpPasswordPost = async (req: Request, res: Response): Promise<any>
     const result = await ForgotPassword.findOne({
       email: email,
       otp: otp,
-      action: 'ForgotPassword',
+      action: "ForgotPassword",
     });
 
     if (!result) {
-      res.status(404).json({ code: 404, message: 'Invalid OTP or email' });
+      res.status(404).json({ code: 404, message: "Invalid OTP or email" });
     }
 
     const user = await User.findOne({
       email: email,
       deleted: false,
-    }).select('+token');
+    }).select("+token");
 
     res.status(200).json({
       code: 200,
-      message: 'OTP verified successfully',
+      message: "OTP verified successfully",
       result: user.token,
     });
   } catch (error) {
@@ -309,16 +312,16 @@ export const resetPasswordPost = async (req: Request, res: Response): Promise<an
     const { oldPassword, newPassword } = req.body;
     const userId: string = req.user.id;
 
-    const user = await User.findOne({ _id: userId, deleted: false }).select('+password');
+    const user = await User.findOne({ _id: userId, deleted: false }).select("+password");
 
     if (!user) {
-      return res.status(404).json({ code: 404, message: 'User not found' });
+      return res.status(404).json({ code: 404, message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ code: 401, message: 'Invalid old password' });
+      return res.status(401).json({ code: 401, message: "Invalid old password" });
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -327,7 +330,7 @@ export const resetPasswordPost = async (req: Request, res: Response): Promise<an
 
     res.status(200).json({
       code: 200,
-      message: 'Password reset successfully',
+      message: "Password reset successfully",
     });
   } catch (error) {
     res.status(500).send({ code: 500, error: error.message });

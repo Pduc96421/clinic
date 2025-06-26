@@ -1,13 +1,12 @@
 import { Router } from 'express';
 const router: Router = Router();
 
-import * as authMiddleware from '../../../middlewares/auth.middleware';
 import * as controllerSchedule from '../controllers/schedule.controller';
 
-router.post('/create/:doctorId', authMiddleware.verifyToken, controllerSchedule.createSchedule);
+router.post('/create/:doctorId', controllerSchedule.createSchedule);
 
-router.get('/doctor/:doctorId', authMiddleware.verifyToken, controllerSchedule.getScheduleByDoctor);
+router.get('/doctor/:doctorId', controllerSchedule.getScheduleByDoctor);
 
-router.patch('/update/:scheduleId', authMiddleware.verifyToken, controllerSchedule.updateSchedule);
+router.patch('/update/:scheduleId', controllerSchedule.updateSchedule);
 
 export const scheduleRouter: Router = router;

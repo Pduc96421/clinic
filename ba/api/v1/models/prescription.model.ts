@@ -10,7 +10,7 @@ const PrescriptionSchema = new Schema({
       dosage: String,
     },
   ],
-});
+}, { timestamps: true },);
 
 const Prescription = model('Prescription', PrescriptionSchema, "prescription");
 
