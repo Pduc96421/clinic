@@ -25,7 +25,7 @@ export const getDoctorAppointments = async (req: Request, res: Response): Promis
     const appointments = await Appointment.find(filter)
       .populate({
         path: "patient_id",
-        select: "full_name dob phone email",
+        select: "_id full_name dob phone email",
       })
       .populate({
         path: "doctor_id",

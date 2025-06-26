@@ -22,7 +22,5 @@ export const updateStatusAppointment = (req: Request, res: Response, next: NextF
     }
   }
 
-  console.log(req.user, status);
-
   next();
 };
