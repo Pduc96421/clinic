@@ -21,4 +21,6 @@ router.patch(
   controllerPrescription.updatePrescription,
 );
 
+router.delete("/:prescriptionId", validateAuthorization.denyRoles(['patient']), controllerPrescription.deletePrescription);
+
 export const prescriptionRouter: Router = router;

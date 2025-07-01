@@ -11,6 +11,9 @@ import { medicalRecordRouter } from "./medical-record.route";
 import { prescriptionRouter } from "./prescription.route";
 import { feedbackRouter } from "./feedback.route";
 import { statsRouter } from "./stats.route";
+import { chatRoute } from "./chat.route";
+import { roomChatRoute } from "./room-chat.route";
+import { usersRoute } from "./users.route";
 
 export const routeApiV1 = (app: Express): void => {
   const version = "/api/v1";
@@ -30,4 +33,10 @@ export const routeApiV1 = (app: Express): void => {
   app.use(version + "/feedbacks", authMiddleware.verifyToken, feedbackRouter);
 
   app.use(version + "/stats", authMiddleware.verifyToken, validateAuthorization.denyRoles(["patient"]), statsRouter);
+
+  app.use(version + "/chats", authMiddleware.verifyToken, chatRoute);
+
+  app.use(version + "/room-chat", authMiddleware.verifyToken, roomChatRoute);
+
+  app.use(version + "/users", authMiddleware.verifyToken, usersRoute);
 };

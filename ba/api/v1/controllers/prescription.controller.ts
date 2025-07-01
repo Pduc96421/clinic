@@ -18,23 +18,24 @@ export const createPrescription = async (req: Request, res: Response): Promise<a
       return res.status(409).json({ code: 409, message: "Prescription already exists" });
     }
 
-    // Kiểm tra Thuốc có trong database và stock
-    const medicineIds = medicines.map((m: any) => m.medicine_id);
+    for (const item of medicines) {
+      const med = await Medicine.findById(item.medicine_id);
 
-    const foundMedicines = await Medicine.find({
-      _id: { $in: medicineIds },
-      stock: { $ne: 0 },
-    }).select("_id");
-    const foundIds = foundMedicines.map((m) => m._id.toString());
+      if (!med) {
+        return res.status(404).json({ code: 404, message: `Medicine not found` });
+      }
 
-    const notFound = medicineIds.filter((id: string) => !foundIds.includes(id));
-    if (notFound.length > 0) {
-      return res.status(400).json({
-        code: 400,
-        message: `The following medicine(s) do not exist or Out of Stock: ${notFound.join(", ")}`,
+      if (med.stock < item.quantity) {
+        return res.status(400).json({
+          code: 400,
+          message: `Medicine ${med.name} has only ${med.stock} in stock`,
+        });
+      }
+
+      await Medicine.findByIdAndUpdate(item.medicine_id, {
+        $inc: { stock: -item.quantity },
       });
     }
-    // End Kiểm tra Thuốc có trong database khong
 
     const newPrescription = await Prescription.create({ record_id, medicines });
 
@@ -53,7 +54,7 @@ export const getPrescriptionByRecord = async (req: Request, res: Response): Prom
   try {
     const { recordId } = req.params;
 
-    const prescription = await Prescription.findOne({ record_id: recordId }).populate({
+    const prescription = await Prescription.findOne({ record_id: recordId, deleted: false }).populate({
       path: "medicines.medicine_id",
       select: "name description",
     });
@@ -91,5 +92,25 @@ export const updatePrescription = async (req: Request, res: Response): Promise<a
     });
   } catch (error) {
     res.status(500).json({ code: 500, error: error.message });
+  }
+};
+
+// Delete /api/v1/prescriptions/delete/:prescriptionId
+export const deletePrescription = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { prescriptionId } = req.params;
+
+    const deleted = await Prescription.findByIdAndUpdate(prescriptionId, { deleted: true, deletedAt: new Date() });
+
+    if (!deleted) {
+      return res.status(404).json({ code: 404, message: "Prescription not found" });
+    }
+
+    res.status(201).json({
+      code: 201,
+      message: "Delete prescription successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
   }
 };

@@ -86,7 +86,7 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
     );
     newUser.token = token;
 
-    // await newUser.save();
+    await newUser.save();
 
     res.status(201).json({
       code: 201,

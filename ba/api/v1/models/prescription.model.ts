@@ -10,6 +10,8 @@ const PrescriptionSchema = new Schema(
         dosage: String,
       },
     ],
+    deleted: { type: Boolean, default: false },
+    deletedAt: Date,
   },
   { timestamps: true },
 );
