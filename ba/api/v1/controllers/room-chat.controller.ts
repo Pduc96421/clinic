@@ -75,9 +75,11 @@ export const getRoomChatByRoomId = async (req: Request, res: Response): Promise<
       return res.status(404).json({ code: 404, message: "Room not found" });
     }
 
-    const isUserInRoom = room.users.some((u) => u.user_id && u.user_id._id.toString() === currentUserId);
-    if (!isUserInRoom) {
-      return res.status(403).json({ code: 403, message: "You are not a member of this room" });
+    if (req.user.role !== "admin") {
+      const isUserInRoom = room.users.some((u) => u.user_id && u.user_id._id.toString() === currentUserId);
+      if (!isUserInRoom) {
+        return res.status(403).json({ code: 403, message: "You are not a member of this room" });
+      }
     }
 
     const users = room.users.map((u) => {
@@ -173,8 +175,8 @@ export const removeUserInRoomChat = async (req: Request, res: Response): Promise
       return res.status(403).json({ code: 403, message: "You are not a member of this room" });
     }
 
-    if (currentUserInRoom.role_room !== "superAdmin") {
-      return res.status(403).json({ code: 403, message: "Only superAdmin can remove users" });
+    if (currentUserInRoom.role_room !== "superAdmin" && currentUserInRoom.role_room !== "admin") {
+      return res.status(403).json({ code: 403, message: "Only superAdmin and admin can remove users" });
     }
 
     if (currentUserId === userId) {
@@ -189,6 +191,117 @@ export const removeUserInRoomChat = async (req: Request, res: Response): Promise
     await RoomChat.updateOne({ _id: roomId }, { $pull: { users: { user_id: userId } } }, { runValidators: true });
 
     res.status(200).json({ code: 200, message: "User removed from room successfully" });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+};
+
+// Delete /api/v1/room-chat/:roomId/leave
+export const leaveRoomChat = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const currentUserId = req.user.id;
+    const { roomId } = req.params;
+
+    const room = await RoomChat.findOne({ _id: roomId, deleted: false });
+
+    if (!room) {
+      return res.status(404).json({ code: 404, message: "Room not found" });
+    }
+
+    const userInRoom = room.users.find((u) => u.user_id.toString() === currentUserId);
+    if (!userInRoom) {
+      return res.status(403).json({ code: 403, message: "You are not a member of this room" });
+    }
+
+    if (userInRoom.role_room === "superAdmin") {
+      const otherSuperAdmins = room.users.filter(
+        (u) => u.user_id.toString() !== currentUserId && u.role_room === "superAdmin",
+      );
+      if (otherSuperAdmins.length === 0) {
+        return res.status(400).json({
+          code: 400,
+          message: "You are the only superAdmin. Please assign another superAdmin before leaving.",
+        });
+      }
+    }
+
+    await RoomChat.updateOne(
+      { _id: roomId },
+      { $pull: { users: { user_id: currentUserId } } },
+      { runValidators: true },
+    );
+
+    res.status(200).json({ code: 200, message: "You have left the room successfully" });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+};
+
+// Patch /api/v1/room-chat/:roomId/change-super-admin/:newUserId
+export const changeSuperAdmin = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const currentUserId = req.user.id;
+    const { roomId, userId } = req.params;
+
+    const room = await RoomChat.findOne({ _id: roomId, deleted: false });
+    if (!room) {
+      return res.status(404).json({ code: 404, message: "Room not found" });
+    }
+
+    const currentUser = room.users.find((u) => u.user_id.toString() === currentUserId);
+    if (!currentUser || currentUser.role_room !== "superAdmin") {
+      return res.status(403).json({ code: 403, message: "Only superAdmin can transfer ownership" });
+    }
+
+    const targetUser = room.users.find((u) => u.user_id.toString() === userId);
+    if (!targetUser) {
+      return res.status(404).json({ code: 404, message: "Target user is not in the room" });
+    }
+
+    (currentUser.role_room = "admin"), (targetUser.role_room = "superAdmin");
+    await room.save();
+
+    res.status(200).json({ code: 200, message: "Transferred superAdmin successfully" });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+};
+
+// Patch /api/v1/room-chat/:roomId/change-role-room
+export const changeRoleRoom = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const currentUserId = req.user.id;
+    const { roomId } = req.params;
+    const { target_user_id, new_role } = req.body;
+
+    const validRoles = ["user", "admin"];
+    if (!validRoles.includes(new_role)) {
+      return res.status(400).json({ code: 400, message: "Invalid role" });
+    }
+
+    const room = await RoomChat.findById(roomId);
+    if (!room || room.deleted) {
+      return res.status(404).json({ code: 404, message: "Room not found" });
+    }
+
+    const currentUser = room.users.find((u) => u.user_id.toString() === currentUserId);
+    if (!currentUser || currentUser.role_room !== "superAdmin") {
+      return res.status(403).json({ code: 403, message: "Only superAdmin can change roles" });
+    }
+
+    const targetUser = room.users.find((u) => u.user_id.toString() === target_user_id);
+    if (!targetUser) {
+      return res.status(404).json({ code: 404, message: "User not found in room" });
+    }
+
+    if (target_user_id === currentUserId) {
+      return res.status(400).json({ code: 400, message: "Cannot change your own role" });
+    }
+
+    targetUser.role_room = new_role;
+    await room.save();
+
+    res.status(200).json({ code: 200, message: "Role updated successfully" });
   } catch (error) {
     res.status(500).json({ code: 500, message: error.message });
   }

@@ -12,6 +12,12 @@ router.get("/list-room", controllerRoomChat.listRoomChat);
 
 router.get("/info/:roomId", controllerRoomChat.getRoomChatByRoomId);
 
-router.delete('/:roomId/users/:userId', controllerRoomChat.removeUserInRoomChat);
+router.delete("/:roomId/users/:userId", controllerRoomChat.removeUserInRoomChat);
+
+router.delete("/:roomId/leave", controllerRoomChat.leaveRoomChat);
+
+router.patch('/:roomId/change-super-admin/:userId', controllerRoomChat.changeSuperAdmin);
+
+router.patch("/:roomId/change-role-room", controllerRoomChat.changeRoleRoom);
 
 export const roomChatRoute: Router = router;
