@@ -24,3 +24,22 @@ export const sendFileMessage = (req: Request, res: Response, next: NextFunction)
   next();
 };
 
+export const updateMessage = (req: Request, res: Response, next: NextFunction): any => {
+  const { content } = req.body;
+
+  if (!content || content.trim() === "") {
+    return res.status(400).json({ code: 400, message: "Content is required" });
+  }
+
+  next();
+};
+
+export const reactMessage = (req: Request, res: Response, next: NextFunction): any => {
+  const { icon } = req.body;
+
+  if (!icon) {
+    return res.status(400).json({ code: 400, message: "Missing icon reaction" });
+  }
+
+  next();
+};

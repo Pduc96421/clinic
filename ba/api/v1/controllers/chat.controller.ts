@@ -59,11 +59,11 @@ export const sendFileMessage = async (req: Request, res: Response): Promise<any>
       user_id: currentUserId,
       room_chat_id,
       type: "file",
-      file_url: req.body.file_url,             // URL từ Cloudinary
+      file_url: req.body.file_url, // URL từ Cloudinary
       file_name: req.file?.originalname || "", // tên gốc của file
       reply_chat_id: reply_chat_id || null,
     });
-    // await newMessage.save();
+    await newMessage.save();
 
     res.status(200).json({ code: 200, message: "File sent successfully", result: newMessage });
   } catch (error) {
@@ -108,6 +108,109 @@ export const getMessages = async (req: Request, res: Response): Promise<any> => 
   }
 };
 
+// Patch /api/v1/chats/update/:chatId
+export const updateMessage = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { chatId } = req.params;
+    const { content } = req.body;
+    const currentUserId = req.user.id;
+
+    const chat = await Chat.findById(chatId);
+    if (!chat || chat.deleted) {
+      return res.status(404).json({ code: 404, message: "Chat not found" });
+    }
+
+    if (req.user.role !== "admin") {
+      if (chat.user_id.toString() !== currentUserId) {
+        return res.status(403).json({ code: 403, message: "You can only update your own messages" });
+      }
+    }
+
+    chat.content = content;
+    await chat.save();
+
+    res.status(200).json({ code: 200, message: "Message updated successfully", result: chat });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+};
+
+// Patch /api/v1/chats/:chatId/react
+export const reactMessage = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { chatId } = req.params;
+    const { icon } = req.body;
+    const currentUserId = req.user.id;
+
+    const chat = await Chat.findById(chatId);
+    if (!chat || chat.deleted) {
+      return res.status(404).json({ code: 404, message: "Message not found" });
+    }
+
+    const existingReactIndex = chat.reactions.findIndex((r) => r.user_id.toString() === currentUserId);
+
+    if (existingReactIndex !== -1) {
+      // Nếu icon giống nhau → huỷ reaction
+      if (chat.reactions[existingReactIndex].icon === icon) {
+        chat.reactions.splice(existingReactIndex, 1); // huỷ
+      } else {
+        chat.reactions[existingReactIndex].icon = icon; // update icon
+      }
+    } else {
+      chat.reactions.push({ user_id: currentUserId, icon });
+    }
+    await chat.save();
+
+    res.status(200).json({ code: 200, message: "React success", result: chat.reactions });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+};
+
+// Get /api/v1/chats/:chatId/reactions
+export const getReactions = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { chatId } = req.params;
+
+    const chat = await Chat.findById(chatId)
+      .populate({
+        path: "reactions.user_id",
+        select: "username fullName avatar",
+      })
+      .lean();
+    if (!chat) {
+      return res.status(404).json({ code: 404, message: "Message not found" });
+    }
+
+    const reactionCounts: Record<string, number> = {};
+    const reactionUsers: Record<string, any[]> = {};
+
+    for (const reaction of chat.reactions) {
+      const icon = reaction.icon;
+      const user = reaction.user_id;
+
+      if (!reactionCounts[icon]) {
+        reactionCounts[icon] = 0;
+        reactionUsers[icon] = [];
+      }
+
+      reactionCounts[icon]++;
+      reactionUsers[icon].push(user);
+    }
+
+    res.status(200).json({
+      code: 200,
+      message: "Reaction stats fetched successfully",
+      result: {
+        counts: reactionCounts,
+        users: reactionUsers,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+};
+
 // DELETE /api/v1/chats/:chatId
 export const deleteMessage = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -128,6 +231,33 @@ export const deleteMessage = async (req: Request, res: Response): Promise<any> =
     await chat.save();
 
     res.status(200).json({ code: 200, message: "Message deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ code: 500, message: error.message });
+  }
+};
+
+// Delete /api/v1/chats/delete-multiple
+export const deleteMultipleMessages = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { chatIds } = req.body;
+    const userId = req.user.id;
+
+    if (!Array.isArray(chatIds) || chatIds.length === 0) {
+      return res.status(400).json({ code: 400, message: "chatIds must be a non-empty array" });
+    }
+
+    const chats = await Chat.find({ _id: { $in: chatIds }, deleted: false });
+
+    if (req.user.role !== "admin") {
+      const unauthorized = chats.filter((chat) => chat.user_id.toString() !== userId);
+      if (unauthorized.length > 0 && req.user.role !== "admin") {
+        return res.status(403).json({ code: 403, message: "You can only delete your own messages" });
+      }
+    }
+
+    await Chat.updateMany({ _id: { $in: chatIds } }, { $set: { deleted: true, deletedAt: new Date() } });
+
+    res.status(200).json({ code: 200, message: "Messages deleted successfully" });
   } catch (error) {
     res.status(500).json({ code: 500, message: error.message });
   }

@@ -10,6 +10,13 @@ const ChatSchema = new Schema(
     file_name: String,
     deleted: { type: Boolean, default: false },
     deletedAt: Date,
+    reactions: [
+      {
+        user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        icon: { type: String, required: true, enum: ["❤️", "👍", "😂", "😮", "😢", "😡"] },
+        _id: false,
+      },
+    ],
   },
   { timestamps: true },
 );
