@@ -1,4 +1,4 @@
-import { Express, Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { v2 as cloudinary } from "cloudinary";
 import streamifier from "streamifier";
 
@@ -18,15 +18,13 @@ cloudinary.config({
 
 let streamUpload = (buffer: Buffer) => {
   return new Promise((resolve, reject) => {
-    let stream = cloudinary.uploader.upload_stream(
-      (error: any, result: any) => {
-        if (result) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
+    let stream = cloudinary.uploader.upload_stream((error: any, result: any) => {
+      if (result) {
+        resolve(result);
+      } else {
+        reject(error);
       }
-    );
+    });
     streamifier.createReadStream(buffer).pipe(stream);
   });
 };

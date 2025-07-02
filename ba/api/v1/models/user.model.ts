@@ -13,18 +13,8 @@ const userSchema = new Schema(
     phone: String,
     dob: Date,
     address: String,
-    acceptFriends: [
-      {
-        user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        _id: false,
-      },
-    ],
-    requestFriends: [
-      {
-        user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        _id: false,
-      },
-    ],
+    acceptFriends: [{ user_id: { type: Schema.Types.ObjectId, ref: "User", required: true }, _id: false }],
+    requestFriends: [{ user_id: { type: Schema.Types.ObjectId, ref: "User", required: true }, _id: false }],
     friendList: [
       {
         user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },

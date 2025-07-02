@@ -16,7 +16,13 @@ router.post("/auth/login", validateUser.login, controllerUser.loginUser);
 router.post("/auth/register", validateUser.register, controllerUser.registerUser);
 
 // update user
-router.patch("/update/:userId", authMiddleware.verifyToken, upload.single("avatar"), uploadCloud.upload, controllerUser.updateUser);
+router.patch(
+  "/update/:userId",
+  authMiddleware.verifyToken,
+  upload.single("avatar"),
+  uploadCloud.upload,
+  controllerUser.updateUser,
+);
 
 // get user info
 router.get("/info/:userId", authMiddleware.verifyToken, controllerUser.getUserInfo);
@@ -37,6 +43,11 @@ router.post("/password/forgot", validateUser.forgotPasswordPost, controllerUser.
 router.post("/password/otp", controllerUser.otpPasswordPost);
 
 // reset password
-router.post("/password/reset", authMiddleware.verifyToken, validateUser.resetPasswordPost, controllerUser.resetPasswordPost);
+router.post(
+  "/password/reset",
+  authMiddleware.verifyToken,
+  validateUser.resetPasswordPost,
+  controllerUser.resetPasswordPost,
+);
 
 export const userRoutes: Router = router;

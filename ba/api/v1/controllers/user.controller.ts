@@ -14,9 +14,9 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
     const { username, password } = req.body;
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username);
 
-    const user = await User.findOne(isEmail ? { email: username, deleted: false } : { username: username, deleted: false }).select(
-      "+password +token",
-    );
+    const user = await User.findOne(
+      isEmail ? { email: username, deleted: false } : { username: username, deleted: false },
+    ).select("+password +token");
 
     if (!user) {
       return res.status(404).json({ code: 404, message: "User not found" });
@@ -173,22 +173,14 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
 
     if (req.user.role !== "admin") {
       if (userId !== myUserId) {
-        return res.status(403).json({
-          code: 403,
-          message: "You are not authorized to update this user",
-        });
+        return res.status(403).json({ code: 403, message: "You are not authorized to update this user" });
       }
     }
 
     await User.updateOne({ _id: userId, deleted: false }, { $set: updateData });
-
     const updatedUser = await User.findById(userId);
 
-    res.status(200).json({
-      code: 200,
-      message: "User updated successfully",
-      result: updatedUser,
-    });
+    res.status(200).json({ code: 200, message: "User updated successfully", result: updatedUser });
   } catch (error) {
     res.status(500).send({ code: 500, error: error.message });
   }

@@ -40,6 +40,7 @@ export const listRoomChat = async (req: Request, res: Response): Promise<any> =>
         path: "users.user_id",
         select: "username fullName email sex avatar role dob",
       })
+      .select("-__v")
       .lean();
 
     const result = rooms.map((room) => {
@@ -48,6 +49,11 @@ export const listRoomChat = async (req: Request, res: Response): Promise<any> =>
         infoUser.role_room = u.role_room;
         return infoUser;
       });
+
+      if (room.typeRoom === "friend") {
+        const targetUser = users.find((u) => u._id.toString() !== currentUserId);
+        room.title = targetUser.fullName;
+      }
 
       return { ...room, users: users };
     });
@@ -69,6 +75,7 @@ export const getRoomChatByRoomId = async (req: Request, res: Response): Promise<
         path: "users.user_id",
         select: "username fullName email sex avatar role dob",
       })
+      .select("-__v")
       .lean();
 
     if (!room) {
@@ -87,6 +94,12 @@ export const getRoomChatByRoomId = async (req: Request, res: Response): Promise<
       infoUser.role_room = u.role_room;
       return infoUser;
     });
+
+    if (room.typeRoom === "friend") {
+      const targetUser = users.find((u) => u._id.toString() !== currentUserId);
+      room.title = targetUser.fullName;
+    }
+    
     const result = { ...room, users };
 
     res.status(200).json({ code: 200, message: "Get room chat by roomId successfully", result: result });
