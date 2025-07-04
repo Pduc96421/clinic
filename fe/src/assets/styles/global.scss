@@ -1,6 +1,14 @@
-:root{
-  --primary-color: #B89D46;
-  --primary: red;
+:root {
+  --color-background: #fef6e4;
+  --color-headline: #001858;
+  --color-paragraph: #172c66;
+  --color-button: #f582ae;
+  --color-button-text: #001858;
+  --color-illustration: #001858;
+  --color-main: #f3d2c1;
+  --color-highlight: #fef6e4;
+  --color-secondary: #8bd3dd;
+  --color-tertiary: #f582ae;
 }
 
 * {
@@ -14,11 +22,14 @@ html {
 }
 
 body {
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
   font-size: 1.6rem;
   line-height: 1.5;
   text-rendering: optimizeSpeed;
   font-optical-sizing: auto;
   font-style: normal;
   overflow-y: overlay;
+
+  background-color: var(--color-background);
+  color: var(--color-paragraph);
 }

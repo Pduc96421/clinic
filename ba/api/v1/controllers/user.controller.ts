@@ -78,6 +78,7 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
         id: newUser._id,
         username: newUser.username,
         fullName: newUser.fullName,
+        avatar: newUser.avatar,
         email: newUser.email,
         role: newUser.role,
       },
@@ -210,7 +211,6 @@ export const getUserInfo = async (req: Request, res: Response): Promise<any> => 
 export const getMyProfile = async (req: Request, res: Response): Promise<any> => {
   try {
     const myUserId = req.user.id;
-
     const user = await User.findOne({ _id: myUserId, deleted: false });
 
     if (!user) {

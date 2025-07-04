@@ -1,82 +1,97 @@
-import classNames from 'classnames/bind';
-import styles from './Login.module.scss';
-import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { Form, Input, Button, message, Typography } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../../../services/auth.service";
+import { setCookie } from "../../../helpers/cookie";
 
+import classNames from "classnames/bind";
+import styles from "./Login.module.scss";
+import { decodeToken } from "../../../utils/auth.util";
+import { checkLogin } from "../../../store/actions/login";
+import { useDispatch } from "react-redux";
+
+const { Title } = Typography;
 const cx = classNames.bind(styles);
 
-type FormData = {
-  username: string;
-  password: string;
-};
-
-function Login() {
+export default function Login() {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>();
+  const dispatch = useDispatch();
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const onFinish = async (values: { username: string; password: string }) => {
+    setLoading(true);
+    const hide = message.loading("Đang đăng nhập...", 0);
+    try {
+      const res = await loginUser(values);
+      const token = res.data.result;
+      setCookie("token", token);
+
+      const userData = decodeToken(token);
+      dispatch(checkLogin(true, userData));
+
+      hide();
+      message.success("Đăng nhập thành công!");
+      navigate("/");
+    } catch (err: any) {
+      hide();
+      console.error("Login error:", err.response || err);
+      message.error(err.response?.data?.message || "Đăng nhập thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)} className={cx('form-login')}>
-        <h2>Đăng nhập</h2>
-
-        <label htmlFor="username">Tên đăng nhập: </label>
-        <input
-          type="text"
-          id="username"
-          placeholder="Tên đăng nhập hoặc Email ..."
-          {...register('username', {
-            required: 'Hãy nhập tên đăng nhập',
-            minLength: {
-              value: 4,
-              message: 'Tên đăng nhập phải có ít nhất 4 kí tự',
-            },
-          })}
-        />
-        {errors.username && <p className={cx('error')}>{errors.username.message}</p>}
-
-        <label htmlFor="password">Mật khẩu: </label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Mật khẩu ..."
-          {...register('password', {
-            required: 'Hãy nhập mật khẩu',
-            minLength: {
-              value: 6,
-              message: 'Mật khẩu phải có ít nhất 6 kí tự',
-            },
-            pattern: {
-              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/,
-              message: 'Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số',
-            },
-          })}
-        />
-        {errors.password && <p className={cx('error')}>{errors.password.message}</p>}
-
-        <button type="submit" className={cx('btn-submit')}>
+    <div className={cx("login-container")}>
+      <Form layout="vertical" onFinish={onFinish}>
+        <Title level={3} className={cx("title")}>
           Đăng nhập
-        </button>
+        </Title>
 
-        <Link to={'/auth/forgot-password'} className={cx('btn-forgot-password')}>
-          quên mật khẩu?
-        </Link>
+        <Form.Item
+          label="Tên đăng nhập hoặc Email"
+          name="username"
+          rules={[
+            { required: true, message: "Hãy nhập tên đăng nhập" },
+            { min: 4, message: "Tên đăng nhập phải có ít nhất 4 kí tự" },
+          ]}
+        >
+          <Input placeholder="Tên đăng nhập hoặc Email..." />
+        </Form.Item>
 
-        <div className={cx('divide-line')}></div>
+        <Form.Item
+          label="Mật khẩu"
+          name="password"
+          rules={[
+            { required: true, message: "Hãy nhập mật khẩu" },
+            { min: 6, message: "Mật khẩu phải có ít nhất 6 kí tự" },
+            {
+              pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+              message: "Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số",
+            },
+          ]}
+        >
+          <Input.Password placeholder="Mật khẩu..." />
+        </Form.Item>
 
-        <button onClick={() => {navigate('/auth/register')}} type="button" className={cx('btn-register')}>
-          Tạo tài khoản mới
-        </button>
-      </form>
-    </>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block loading={loading}>
+            Đăng nhập
+          </Button>
+        </Form.Item>
+
+        <Form.Item>
+          <Link to="/auth/forgot-password" className={cx("link-forgot")}>
+            Quên mật khẩu?
+          </Link>
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="default" block onClick={() => navigate("/auth/register")}>
+            Tạo tài khoản mới
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
 }
-
-export default Login;

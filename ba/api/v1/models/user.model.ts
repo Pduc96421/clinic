@@ -7,7 +7,7 @@ const userSchema = new Schema(
     email: String,
     password: { type: String, select: false },
     token: { type: String, select: false },
-    sex: String,
+    sex: { type: String, enum: ["male", "female", "other"] },
     avatar: { type: String, default: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
     role: { type: String, enum: ["patient", "doctor", "admin"], require: true },
     phone: String,

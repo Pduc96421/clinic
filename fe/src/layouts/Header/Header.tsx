@@ -1,0 +1,72 @@
+import { Layout, Input, Tooltip, Space, Button } from "antd";
+import { MessageOutlined, BellOutlined, LoginOutlined, UserAddOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
+import classNames from "classnames/bind";
+import styles from "./Header.module.scss";
+import UserDropdown from "../Dropdown/Dropdown";
+import { getCookie } from "../../helpers/cookie";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/reducers";
+
+const { Header: AntHeader } = Layout;
+const { Search } = Input;
+
+const cx = classNames.bind(styles);
+
+function Header() {
+  const navigate = useNavigate();
+  const token = getCookie("token");
+
+  const { userData } = useSelector((state: RootState) => state.auth);
+
+  return (
+    <AntHeader className={cx("header")}>
+      <div className={cx("left")}>
+        <Link to="/" className={cx("logo")}>
+          Phòng Khám ABC
+        </Link>
+        <Search
+          placeholder="Tìm kiếm..."
+          allowClear
+          className={cx("search")}
+          onSearch={(value) => console.log("Tìm:", value)}
+        />
+      </div>
+
+      <Space size="middle" className={cx("right")}>
+        <Tooltip title="Tư vấn trực tuyến">
+          <Button type="text" icon={<MessageOutlined />} onClick={() => navigate("/chat")} />
+        </Tooltip>
+
+        <Tooltip title="Thông báo">
+          <Button type="text" icon={<BellOutlined />} />
+        </Tooltip>
+
+        {token ? (
+          <UserDropdown userData={userData} />
+        ) : (
+          <>
+            <Button
+              type="text"
+              icon={<LoginOutlined />}
+              onClick={() => navigate("/auth/login")}
+              style={{ color: "var(--color-headline)" }}
+            >
+              Đăng nhập
+            </Button>
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={() => navigate("/auth/register")}
+              style={{ backgroundColor: "var(--color-button)", color: "var(--color-button-text)" }}
+            >
+              Đăng ký
+            </Button>
+          </>
+        )}
+      </Space>
+    </AntHeader>
+  );
+}
+
+export default Header;
