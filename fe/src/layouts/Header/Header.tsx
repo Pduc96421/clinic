@@ -35,11 +35,11 @@ function Header() {
 
       <Space size="middle" className={cx("right")}>
         <Tooltip title="Tư vấn trực tuyến">
-          <Button type="text" icon={<MessageOutlined />} onClick={() => navigate("/chat")} />
+          <Button type="default" icon={<MessageOutlined />} onClick={() => navigate("/chat")} />
         </Tooltip>
 
         <Tooltip title="Thông báo">
-          <Button type="text" icon={<BellOutlined />} />
+          <Button type="default" icon={<BellOutlined />} />
         </Tooltip>
 
         {token ? (
@@ -47,10 +47,9 @@ function Header() {
         ) : (
           <>
             <Button
-              type="text"
+              type="primary"
               icon={<LoginOutlined />}
               onClick={() => navigate("/auth/login")}
-              style={{ color: "var(--color-headline)" }}
             >
               Đăng nhập
             </Button>
@@ -58,7 +57,6 @@ function Header() {
               type="primary"
               icon={<UserAddOutlined />}
               onClick={() => navigate("/auth/register")}
-              style={{ backgroundColor: "var(--color-button)", color: "var(--color-button-text)" }}
             >
               Đăng ký
             </Button>

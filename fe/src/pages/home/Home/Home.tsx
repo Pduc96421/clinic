@@ -2,12 +2,16 @@ import { Button, Typography, Row, Col, Card } from "antd";
 import { useNavigate } from "react-router-dom";
 import styles from "./Home.module.scss";
 import classNames from "classnames/bind";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/reducers";
 
 const cx = classNames.bind(styles);
 const { Title, Paragraph } = Typography;
 
 function Home() {
   const navigate = useNavigate();
+
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
   return (
     <div className={cx("home-container")}>
@@ -19,9 +23,11 @@ function Home() {
               Chăm sóc sức khỏe tận tâm, chất lượng hàng đầu. Đặt lịch khám dễ dàng với đội ngũ bác sĩ giàu kinh nghiệm.
             </Paragraph>
             <div className={cx("button-group")}>
-              <Button type="primary" size="large" onClick={() => navigate("/auth/register")}>
-                Đăng ký ngay
-              </Button>
+              {isLoggedIn || (
+                <Button type="primary" size="large" onClick={() => navigate("/auth/register")}>
+                  Đăng ký ngay
+                </Button>
+              )}
               <Button type="default" size="large" onClick={() => navigate("/chat")}>
                 Tư vấn trực tuyến
               </Button>

@@ -1,0 +1,26 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: var(--color-highlight);
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  flex: 1;
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--color-main);
+  color: var(--color-headline);
+}

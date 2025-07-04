@@ -7,23 +7,16 @@ import ChatLayout from "../pages/chat/ChatLayout/ChatLayout";
 import Home from "../pages/home/Home/Home";
 
 export const routes = [
-  { path: "/auth/login", element: <Login /> },
-  { path: "/auth/register", element: <Register /> },
-  { path: "/auth/verify-account", element: <VerifyAccount /> },
   {
     element: <LayoutDefault />,
     children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: '/chat',
-        element: <ChatLayout />
-      },
+      { path: "/auth/login", element: <Login /> },
+      { path: "/auth/register", element: <Register /> },
+      { path: "/auth/verify-account", element: <VerifyAccount /> },
+      { path: "/", element: <Home /> },
       {
         element: <PrivateRoutes />,
-        children: [],
+        children: [{ path: "/chat", element: <ChatLayout /> }],
       },
     ],
   },

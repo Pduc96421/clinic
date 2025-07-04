@@ -27,7 +27,6 @@ export default function UserDropdown({ userData }: UserDropdownProps) {
     } else if (key === "logout") {
       deleteCookie("token");
       dispatch(checkLogin(false, null));
-      navigate("/auth/login");
     }
   };
 
