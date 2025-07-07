@@ -1,0 +1,36 @@
+.container {
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background-color: var(--color-background);
+}
+
+.sider {
+  background-color: var(--color-main) !important;
+  color: var(--color-paragraph);
+  font-size: 1.6rem;
+  overflow-y: auto;
+
+  .ant-menu {
+    background-color: transparent;
+  }
+
+  .ant-menu-item-selected {
+    background-color: var(--color-tertiary) !important;
+    color: var(--color-button-text) !important;
+  }
+
+  .ant-menu-item {
+    &:hover {
+      background-color: var(--color-button-hover);
+      color: var(--color-button-text);
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  background-color: var(--color-highlight);
+}

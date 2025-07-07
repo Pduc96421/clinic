@@ -23,6 +23,8 @@ export default function UserDropdown() {
       deleteCookie("token");
       dispatch(checkLogin(false, null));
       navigate("/");
+    } else if (key === "friends") {
+      navigate("/friends");
     }
   };
 
@@ -30,6 +32,10 @@ export default function UserDropdown() {
     {
       key: "profile",
       label: "Trang cá nhân",
+    },
+    {
+      key: "friends",
+      label: "Bạn bè",
     },
     {
       key: "logout",

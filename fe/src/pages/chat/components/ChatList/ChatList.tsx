@@ -1,7 +1,8 @@
-import { Input, List, Avatar } from "antd";
+import { Input, List, Avatar, Typography } from "antd";
 import styles from "../../styles/chat.module.scss";
 import classNames from "classnames/bind";
 
+const { Title } = Typography;
 const cx = classNames.bind(styles);
 
 const dummyConversations = [
@@ -12,6 +13,7 @@ const dummyConversations = [
 export default function ChatList() {
   return (
     <div className={cx("chat-list")}>
+      <Title>Tin nhắn</Title>
       <Input.Search placeholder="Tìm kiếm" className={cx("search")} />
       <List
         itemLayout="horizontal"
