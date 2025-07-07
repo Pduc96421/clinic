@@ -22,6 +22,7 @@ export default function UserDropdown() {
     } else if (key === "logout") {
       deleteCookie("token");
       dispatch(checkLogin(false, null));
+      navigate("/");
     }
   };
 

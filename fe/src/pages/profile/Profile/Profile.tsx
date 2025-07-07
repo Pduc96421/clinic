@@ -74,6 +74,9 @@ export default function Profile() {
           <Button type="primary" onClick={() => navigate("/profile/edit")}>
             Chỉnh sửa
           </Button>
+          <Button type="primary" onClick={() => navigate("/profile/change-password")}>
+            Đổi mật khẩu
+          </Button>
         </div>
       </Card>
     </div>
