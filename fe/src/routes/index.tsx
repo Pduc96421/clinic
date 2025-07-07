@@ -5,6 +5,8 @@ import Register from "../pages/auth/Register";
 import VerifyAccount from "../pages/auth/VerifyAccount/VerifyAccount";
 import ChatLayout from "../pages/chat/ChatLayout/ChatLayout";
 import Home from "../pages/home/Home/Home";
+import Profile from "../pages/profile/Profile/Profile";
+import UpdateUser from "../pages/profile/UpdateUser/UpdateUser";
 
 export const routes = [
   {
@@ -16,7 +18,19 @@ export const routes = [
       { path: "/", element: <Home /> },
       {
         element: <PrivateRoutes />,
-        children: [{ path: "/chat", element: <ChatLayout /> }],
+        children: [
+          { path: "/chat", element: <ChatLayout /> },
+          {
+            path: "/profile",
+            children: [
+              { path: "", element: <Profile /> },
+              {
+                path: "edit",
+                element: <UpdateUser />,
+              },
+            ],
+          },
+        ],
       },
     ],
   },

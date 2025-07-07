@@ -1,0 +1,8 @@
+.avatar {
+  cursor: pointer;
+  transition: all 0.3s;
+  &:hover {
+    opacity: 0.85;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+  }
+}

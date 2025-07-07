@@ -17,6 +17,7 @@ function Header() {
   const navigate = useNavigate();
   const token = getCookie("token");
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { userData } = useSelector((state: RootState) => state.auth);
 
   return (
@@ -43,21 +44,13 @@ function Header() {
         </Tooltip>
 
         {token ? (
-          <UserDropdown userData={userData} />
+          <UserDropdown />
         ) : (
           <>
-            <Button
-              type="primary"
-              icon={<LoginOutlined />}
-              onClick={() => navigate("/auth/login")}
-            >
+            <Button type="primary" icon={<LoginOutlined />} onClick={() => navigate("/auth/login")}>
               Đăng nhập
             </Button>
-            <Button
-              type="primary"
-              icon={<UserAddOutlined />}
-              onClick={() => navigate("/auth/register")}
-            >
+            <Button type="primary" icon={<UserAddOutlined />} onClick={() => navigate("/auth/register")}>
               Đăng ký
             </Button>
           </>

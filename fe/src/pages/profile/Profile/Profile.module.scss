@@ -1,0 +1,41 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 700px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.06);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .username {
+    margin-top: 16px;
+    margin-bottom: 4px;
+  }
+
+  .role {
+    color: #888;
+    font-size: 16px;
+  }
+}
+
+.info {
+  margin-bottom: 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
