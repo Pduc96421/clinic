@@ -7,6 +7,7 @@ const RoomChatSchema = new Schema(
     theme: String,
     typeRoom: { type: String, enum: ["group", "friend"] },
     status: String,
+    lastMessage: { type: Schema.Types.ObjectId, ref: "Chat" },
     users: [
       {
         user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },

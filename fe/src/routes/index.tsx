@@ -4,6 +4,8 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import VerifyAccount from "../pages/auth/VerifyAccount/VerifyAccount";
 import ChatLayout from "../pages/chat/ChatLayout/ChatLayout";
+import ChatWindow from "../pages/chat/components/ChatWindow/ChatWindow";
+import CreateRoomPage from "../pages/chat/components/CreateRoom/CreateRoom";
 import FriendList from "../pages/friends/FriendList/FriendList";
 import FriendsPage from "../pages/friends/FriendPage/FriendPage";
 import Requests from "../pages/friends/Requests/Requests";
@@ -26,7 +28,14 @@ export const routes = [
       {
         element: <PrivateRoutes />,
         children: [
-          { path: "/chat", element: <ChatLayout /> },
+          {
+            path: "/chat",
+            element: <ChatLayout />,
+            children: [
+              { path: ":roomId", element: <ChatWindow /> },
+              { path: "create", element: <CreateRoomPage /> },
+            ],
+          },
           {
             path: "/profile",
             children: [

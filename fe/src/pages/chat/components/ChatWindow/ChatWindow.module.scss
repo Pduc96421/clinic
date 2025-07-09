@@ -1,0 +1,134 @@
+.chat-window {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-highlight);
+  padding: 1rem;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-bottom: 1rem;
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
+
+  &.me {
+    justify-content: flex-end;
+
+    .message-bubble {
+      background-color: var(--color-paragraph);
+      color: white;
+      border-top-right-radius: 0;
+    }
+  }
+
+  .avatar {
+    margin-right: 0.5rem;
+  }
+
+  .message-bubble {
+    max-width: 70%;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    background: #f1f1f1;
+    font-size: 1.4rem;
+  }
+}
+
+.input-area {
+  display: block;
+  gap: 0.5rem;
+
+  textarea {
+    resize: none;
+  }
+
+  button {
+    flex-shrink: 0;
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.submit {
+  display: flex;
+  gap: 0.5rem;
+
+  textarea {
+    resize: none;
+  }
+
+  button {
+    flex-shrink: 0;
+  }
+}
+
+.reply-content {
+  border-left: 3px solid var(--color-main);
+  padding-left: 8px;
+  margin-bottom: 4px;
+  font-size: 1.3rem;
+  color: #fff;
+
+  .reply-author {
+    font-weight: bold;
+  }
+
+  .reply-text {
+    font-style: italic;
+  }
+}
+
+.reply-preview {
+  padding: 0.5rem 1rem;
+  background: #f0f0f0;
+  border-left: 3px solid var(--color-main);
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+}
+
+.message-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 8px;
+
+  button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.4rem;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.message-row {
+  .message-actions {
+    display: none;
+  }
+
+  &:hover .message-actions {
+    display: flex;
+  }
+}

@@ -4,12 +4,14 @@ import styles from "./Home.module.scss";
 import classNames from "classnames/bind";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/reducers";
+import { getCookie } from "../../../helpers/cookie";
 
 const cx = classNames.bind(styles);
 const { Title, Paragraph } = Typography;
 
 function Home() {
   const navigate = useNavigate();
+  const token = getCookie('token');
 
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
@@ -23,7 +25,7 @@ function Home() {
               Chăm sóc sức khỏe tận tâm, chất lượng hàng đầu. Đặt lịch khám dễ dàng với đội ngũ bác sĩ giàu kinh nghiệm.
             </Paragraph>
             <div className={cx("button-group")}>
-              {isLoggedIn || (
+              {!token && (
                 <Button type="primary" size="large" onClick={() => navigate("/auth/register")}>
                   Đăng ký ngay
                 </Button>

@@ -40,6 +40,15 @@ export const listRoomChat = async (req: Request, res: Response): Promise<any> =>
         path: "users.user_id",
         select: "username fullName email sex avatar role dob",
       })
+      .populate({
+        path: "lastMessage",
+        populate: {
+          path: "user_id",
+          select: "fullName",
+        },
+        select: "content user_id createdAt",
+      })
+      .sort({ updatedAt: -1 })
       .select("-__v")
       .lean();
 
@@ -50,15 +59,26 @@ export const listRoomChat = async (req: Request, res: Response): Promise<any> =>
         return infoUser;
       });
 
+      let title = room.title;
+      let avatar = null;
+
       if (room.typeRoom === "friend") {
         const targetUser = users.find((u) => u._id.toString() !== currentUserId);
-        room.title = targetUser.fullName;
+        if (targetUser) {
+          title = targetUser.fullName;
+          avatar = targetUser.avatar;
+        }
       }
 
-      return { ...room, users: users };
+      return {
+        ...room,
+        users,
+        title,
+        avatar,
+      };
     });
 
-    res.status(200).json({ code: 200, message: "Get list friend successfully", result: result });
+    res.status(200).json({ code: 200, message: "Get list friend successfully", result });
   } catch (error) {
     res.status(500).json({ code: 500, message: error.message });
   }
@@ -74,6 +94,14 @@ export const getRoomChatByRoomId = async (req: Request, res: Response): Promise<
       .populate({
         path: "users.user_id",
         select: "username fullName email sex avatar role dob",
+      })
+      .populate({
+        path: "lastMessage",
+        populate: {
+          path: "user_id",
+          select: "fullName",
+        },
+        select: "content user_id createdAt",
       })
       .select("-__v")
       .lean();
@@ -99,7 +127,7 @@ export const getRoomChatByRoomId = async (req: Request, res: Response): Promise<
       const targetUser = users.find((u) => u._id.toString() !== currentUserId);
       room.title = targetUser.fullName;
     }
-    
+
     const result = { ...room, users };
 
     res.status(200).json({ code: 200, message: "Get room chat by roomId successfully", result: result });

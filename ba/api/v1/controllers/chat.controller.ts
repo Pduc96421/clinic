@@ -28,6 +28,8 @@ export const sendMessage = async (req: Request, res: Response): Promise<any> => 
     const chat = new Chat({ user_id: currentUserId, room_chat_id, content, reply_chat_id: reply_chat_id || null });
     await chat.save();
 
+    await RoomChat.findByIdAndUpdate(room_chat_id, { lastMessage: chat._id });
+
     res.status(200).json({ code: 200, message: "Message sent", result: chat });
   } catch (error) {
     res.status(500).json({ code: 500, message: error.message });
@@ -64,6 +66,8 @@ export const sendFileMessage = async (req: Request, res: Response): Promise<any>
       reply_chat_id: reply_chat_id || null,
     });
     await newMessage.save();
+
+    await RoomChat.findByIdAndUpdate(room_chat_id, { lastMessage: newMessage._id });
 
     res.status(200).json({ code: 200, message: "File sent successfully", result: newMessage });
   } catch (error) {

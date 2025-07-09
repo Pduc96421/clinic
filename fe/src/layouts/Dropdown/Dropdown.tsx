@@ -14,7 +14,8 @@ export default function UserDropdown() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { userData } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const userData = JSON.parse(localStorage.getItem("userData") || "{}");
 
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key === "profile") {

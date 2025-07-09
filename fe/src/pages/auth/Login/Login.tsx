@@ -28,6 +28,7 @@ export default function Login() {
 
       const userData = decodeToken(token);
       dispatch(checkLogin(true, userData));
+      localStorage.setItem("userData", JSON.stringify(userData));
 
       hide();
       message.success("Đăng nhập thành công!");
