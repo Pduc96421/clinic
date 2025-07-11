@@ -1,5 +1,5 @@
 import { Layout } from "antd";
-import ChatList from "../components/ChatList/ChatList";
+import ChatList from "../ChatList/ChatList";
 import styles from "./ChatLayout.module.scss";
 import classNames from "classnames/bind";
 import { Outlet } from "react-router-dom";
@@ -10,7 +10,7 @@ const cx = classNames.bind(styles);
 export default function ChatLayout() {
   return (
     <Layout className={cx("messenger")}>
-      <Sider width={280} className={cx("sider")}>
+      <Sider width={350} className={cx("sider")}>
         <ChatList />
       </Sider>
 

@@ -4,7 +4,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import VerifyAccount from "../pages/auth/VerifyAccount/VerifyAccount";
 import ChatLayout from "../pages/chat/ChatLayout/ChatLayout";
-import ChatWindow from "../pages/chat/components/ChatWindow/ChatWindow";
+import ChatWindow from "../pages/chat/ChatWindow/ChatWindow";
 import CreateRoomPage from "../pages/chat/components/CreateRoom/CreateRoom";
 import FriendList from "../pages/friends/FriendList/FriendList";
 import FriendsPage from "../pages/friends/FriendPage/FriendPage";

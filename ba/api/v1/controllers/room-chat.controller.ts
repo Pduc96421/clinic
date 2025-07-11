@@ -60,7 +60,7 @@ export const listRoomChat = async (req: Request, res: Response): Promise<any> =>
       });
 
       let title = room.title;
-      let avatar = null;
+      let avatar = room.avatar;
 
       if (room.typeRoom === "friend") {
         const targetUser = users.find((u) => u._id.toString() !== currentUserId);

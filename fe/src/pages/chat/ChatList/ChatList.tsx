@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Input, List, Avatar, Typography, Button } from "antd";
+import { Input, List, Avatar, Typography, Button, message } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./ChatList.module.scss";
 import classNames from "classnames/bind";
-import { listRoomChat } from "../../../../services/room-chat.service";
+import { listRoomChat } from "../../../services/room-chat.service";
 import { PlusOutlined } from "@ant-design/icons";
+import ActionRoom from "../components/ActionRoom/ActionRoom";
 
 const { Title } = Typography;
 const cx = classNames.bind(styles);
@@ -23,8 +24,9 @@ export default function ChatList() {
     try {
       const res = await listRoomChat();
       setRooms(res.data.result || []);
-    } catch (err) {
-      console.error("Lỗi khi lấy danh sách phòng:", err);
+    } catch (error: any) {
+      console.error(error);
+      message.error(error.response?.data?.message || "Lỗi lấy thông tin phòng");
     }
   };
 
@@ -57,9 +59,19 @@ export default function ChatList() {
             : "Chưa có tin nhắn";
 
           return (
-            <List.Item className={cx("chat-item", { active: isActive })} onClick={() => navigate(`/chat/${room._id}`)}>
+            <List.Item
+              className={cx("chat-item", { active: isActive })}
+              onClick={() => navigate(`/chat/${room._id}`)}
+              actions={[<ActionRoom roomId={room._id} reloadRooms={fetchRooms} />]}
+            >
               <List.Item.Meta
-                avatar={<Avatar src={room?.avatar || "/images/avatar-default.png"} size="large" />}
+                avatar={
+                  <div style={{ position: "relative" }}>
+                    <Avatar src={room?.avatar} size="large" />
+                    {/* Chấm online giả lập */}
+                    <span className={cx("status-dot")} />
+                  </div>
+                }
                 title={<span>{room.title}</span>}
                 description={<span className={cx("last-message")}>{lastMessageText}</span>}
               />

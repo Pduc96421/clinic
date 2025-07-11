@@ -42,6 +42,11 @@ export default function UpdateUser() {
         dob: values.dob?.format("YYYY-MM-DD"),
       };
       await updateUser(userData._id, payload);
+
+      const updatedRes = await getMyProfile();
+      const updatedUser = updatedRes.data.result;
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+
       hide();
       message.success("Cập nhật thành công!");
     } catch (error: any) {

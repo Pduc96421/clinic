@@ -14,6 +14,7 @@ export default function UserDropdown() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   const userData = JSON.parse(localStorage.getItem("userData") || "{}");
 

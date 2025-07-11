@@ -25,3 +25,10 @@
   50% {transform: rotate(var(--s,30deg))}
   100% {transform: rotate(0)}
 }
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}

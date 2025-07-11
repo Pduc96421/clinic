@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Input, Button, Spin, Avatar, message } from "antd";
-import { PaperClipOutlined } from "@ant-design/icons";
+import { Input, Button, Avatar, message } from "antd";
 import { useParams } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./ChatWindow.module.scss";
-import { getMessages, sendMessage, sendFileMessage } from "../../../../services/chat.service";
-import { api } from "../../../../utils/request.util";
-import LoadingUi from "../../../../components/LoadingUi/LoadingUi";
+import { getMessages, sendMessage } from "../../../services/chat.service";
+import LoadingUi from "../../../components/LoadingUi/LoadingUi";
 
 const { TextArea } = Input;
 const cx = classNames.bind(styles);
@@ -24,6 +22,7 @@ export default function ChatWindow() {
 
   useEffect(() => {
     if (roomId) fetchMessages();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   useEffect(() => {
@@ -79,9 +78,7 @@ export default function ChatWindow() {
     <div className={cx("chat-window")}>
       <div className={cx("messages")}>
         {loading ? (
-          <div className={cx("loading")}>
-            <LoadingUi />
-          </div>
+          <LoadingUi />
         ) : (
           messages.map((msg, index) => {
             const isMe = msg.user_id?._id === userData.id;

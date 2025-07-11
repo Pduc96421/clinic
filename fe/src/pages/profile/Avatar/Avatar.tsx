@@ -4,7 +4,7 @@ import { UserOutlined } from "@ant-design/icons";
 import type { RcFile } from "antd/es/upload";
 import classNames from "classnames/bind";
 import styles from "./Avatar.module.scss";
-import { updateUser } from "../../../services/auth.service";
+import { getMyProfile, updateUser } from "../../../services/auth.service";
 
 const cx = classNames.bind(styles);
 
@@ -14,7 +14,6 @@ interface AvatarUploadProps {
 }
 
 export default function AvatarUpload({ userData, onUploadSuccess }: AvatarUploadProps) {
-
   const handleUpload = async (file: RcFile) => {
     const formData = new FormData();
     formData.append("avatar", file);
@@ -23,6 +22,11 @@ export default function AvatarUpload({ userData, onUploadSuccess }: AvatarUpload
     try {
       const res = await updateUser(userData._id, { formData });
       hide();
+
+      const updatedRes = await getMyProfile();
+      const updatedUser = updatedRes.data.result;
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+
       message.success("Cập nhật ảnh thành công");
       onUploadSuccess?.(res.data.result.avatar);
     } catch (error: any) {

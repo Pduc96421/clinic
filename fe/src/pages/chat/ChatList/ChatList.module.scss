@@ -39,7 +39,7 @@
     transition: background-color 0.2s ease;
 
     &.active {
-      background-color: var(--color-button);
+      background-color: #EBF5FF;
     }
 
     &:hover {
@@ -75,3 +75,36 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background-color: #31a24c;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.chat-item {
+  position: relative;
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 0.8rem;
+  transition: background-color 0.2s;
+
+  &.active {
+    background-color: var(--color-main);
+  }
+
+  &:hover {
+    background-color: var(--color-tertiary);
+    color: var(--color-button-text);
+  }
+
+  .ant-list-item-action {
+    margin-inline-start: auto;
+  }
+}
+
